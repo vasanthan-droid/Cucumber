@@ -1,0 +1,10 @@
+package stepDefinition;
+
+import org.openqa.selenium.By;
+
+public class fnAppOR {
+	public static String strUserID = "SF3004";
+//	public static String strUserID = fnTestData.varDITUser;
+	fnTestData callTestData = new fnTestData ();
+	public static By securlink = By.id("overridelink");
+  and so on
