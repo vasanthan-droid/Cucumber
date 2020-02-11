@@ -1,0 +1,379 @@
+package stepDefinition;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
+import stepDefinition.PaymentsInputOutgoingBKT;
+
+
+public class fnCommonFunctions {
+	PaymentsInputOutgoingBKT callBKTFun = new PaymentsInputOutgoingBKT();
+
+	public static void fnHighlightMe(WebDriver driver, WebElement element) throws InterruptedException {
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		js.executeScript("arguments[0].style.border='4px groove green'", element);
+		Thread.sleep(1000);
+		js.executeScript("arguments[0].style.border=''", element);
+	}
+
+	public static void switch_to_frame(WebDriver wd, String str) throws InterruptedException {
+		WebDriver wdf;
+		Thread.sleep(15000);
+		if (str.equalsIgnoreCase("default")) {
+			wdf = wd.switchTo().defaultContent();
+		} else if (NumberUtils.isNumber(str)) {
+			int frameNum = Integer.parseInt(str);
+			wdf = wd.switchTo().frame(frameNum);
+		} else {
+			wdf = wd.switchTo().frame(str);
+		}
+		}
+
+	
+
+	 public void select(By strlocvalue,String value) {
+
+            WebElement we;
+
+             we= callBKTFun.driver.findElement(strlocvalue);
+
+             Select dd=new Select(we);
+
+             System.out.println(value);
+
+             //dd.deselectByVisibleText(value);
+
+             dd.selectByVisibleText(value);          
+
+     }
+	
+     public static void select_element( WebDriver wd, WebElement we, String value) {
+
+         Select selectbox = new Select(we);
+         selectbox.selectByVisibleText(value);
+
+     }
+
+
+
+	
+	public static void mouse_over(WebDriver wd, WebElement we) throws InterruptedException {
+		try {
+			Actions builder = new Actions(wd);
+			builder.moveToElement(we).build().perform();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	public static void is_mandatory(WebDriver wd, WebElement we, String YesNo, String Identifier) {
+
+		boolean status = false;
+		try {
+			String getPageText = wd.getPageSource();
+			String[] split1;
+			String[] split2;
+			split1 = getPageText.split(Identifier);
+			split2 = split1[1].split("</span>");
+			String mandatoryCheck = split2[0];
+
+			if (YesNo != null) {
+				if (YesNo.equalsIgnoreCase("YES")) {
+					if (mandatoryCheck.toUpperCase().contains("C-REQUIRED")) {
+						status = true;
+					} else {
+						status = false;
+					}
+				} else if (YesNo.equalsIgnoreCase("NO")) {
+					if (mandatoryCheck.toUpperCase().contains("C-REQUIRED")) {
+						status = false;
+					} else {
+						status = true;
+					}
+				} else {
+					status = false;
+					System.out.println("Param 1 must be either Yes or No.  You entered " + YesNo);
+				}
+			} else {
+				status = false;
+				System.out.println("Param 1 is required for Mandatory Check.  Pls enter either Yes or No");
+			}
+		} catch (Exception e) {
+			status = false;
+			System.out.println("Mandatory Check failed.  Pls refer stack trace.");
+
+		}
+	}
+
+
+	
+	
+	public void draganddrop(By srlocator, By dtlocator) throws Throwable {
+		Actions act = new Actions(callBKTFun.driver);
+		callBKTFun.driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		WebElement source = callBKTFun.driver.findElement(srlocator);
+		callBKTFun.driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		WebElement dest = callBKTFun.driver.findElement(dtlocator);
+		act.dragAndDrop(source, dest).perform();
+		callBKTFun.driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+	}
+
+	public void rightClick(By element) {
+		Actions action = new Actions(callBKTFun.driver).contextClick();
+		action.build().perform();
+		System.out.println("Sucessfully Right clicked on the element");
+
+	}
+
+	public void doubleClick(WebElement webElement) {
+		Actions action = new Actions(callBKTFun.driver).doubleClick();
+		action.build().perform();
+		System.out.println("Sucessfully Double clicked on the Element");
+	}
+
+	public void keyEnter() throws Exception {
+		Actions action = new Actions(callBKTFun.driver).sendKeys(Keys.ENTER);
+		action.build().perform();
+		System.out.println("Sucessfully clicked on  Unknown PupUp 'OK' button");
+	}
+	
+	public void TabOut() throws Exception {
+		Actions action = new Actions(callBKTFun.driver).sendKeys(Keys.TAB);
+		action.build().perform();
+		System.out.println("Sucessfully Tabout");
+	}
+
+	public void keyEsc() throws Exception {
+		Actions action = new Actions(callBKTFun.driver).sendKeys(Keys.ESCAPE);
+		action.build().perform();
+		System.out.println("Sucessfully clicked on  Unknown PupUp 'Escape' button");
+	}
+
+	public void SelectAll() throws Exception {
+		Actions action = new Actions(callBKTFun.driver).sendKeys(Keys.chord(Keys.CONTROL, "a"));
+		action.build().perform();
+		System.out.println("Sucessfully clicked on  Unknown PupUp 'Escape' button");
+	}
+
+	public void typeText(String sampleText) {
+		Actions action = new Actions(callBKTFun.driver).sendKeys(sampleText);
+		action.build().perform();
+		System.out.println("Typed text");
+	}
+
+	public static void SetTextToClipboard(String myText) {
+		String text = myText;
+		StringSelection stringSelection = new StringSelection(text);
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(stringSelection, stringSelection);
+	}
+
+	public static void ControlPlusV() throws Exception {
+		Robot robot = new Robot();
+		robot.keyPress(KeyEvent.VK_CONTROL);
+		robot.keyPress(KeyEvent.VK_V);
+		robot.keyRelease(KeyEvent.VK_V);
+		robot.keyRelease(KeyEvent.VK_CONTROL);
+	}
+
+	
+
+	private  String[][] excelRead(File inputFile) {
+        try 
+        {
+
+                 FileInputStream test=new FileInputStream(inputFile);
+//        	FileInputStream test=new FileInputStream("C:\\SeleniumTS for 7dot8\\EURO\\ATR\\Demo\\ATR_SPAIN_PaymentInistiation_FV.xlsm");
+//        	FileInputStream test=new FileInputStream("C:\\SeleniumTS for 7dot9\\Worldlink\\Worldlink_DueCitibankAdj\\Worldlink_DueCitibankAdj_FV.xlsm");
+//        	FileInputStream test = new FileInputStream("C:\\Users\\rr16326\\Desktop\\WorldlinkSEPASelf.xlsm");
+                        XSSFWorkbook wb = new XSSFWorkbook(test);
+                        XSSFSheet sheet = wb.getSheet("Input");
+
+                        int rowNum = sheet.getLastRowNum() + 1 ;
+                        int colNum = sheet.getRow(0).getLastCellNum() ;                                             
+
+                        String[][] data = new String[rowNum][colNum] ;
+
+                        for  ( int i = 0 ; i < rowNum ; i++) {
+                                        Row row = sheet.getRow(i) ;
+                                        for ( int j = 0 ; j < colNum ; j++) {
+                                                        Cell cell = row.getCell(j) ;
+                                                        if (cell!=null){
+                                                                        String value = cellToString(cell);                                                                                               																								
+                                                                        data[i][j] = value ;
+                                                                        if(i==1 && j==4)
+	 System.out.print(value);	
+
+                                                        }
+                                        }
+                        }
+                        return data ;
+        }
+        catch (Exception e) 
+        {
+
+	StackTraceElement[] s = e.getStackTrace();
+	for(int i=0; i<s.length;i++)
+	System.err.println("Exception test :" + s[i]);
+        }
+        return null;
+}
+	private  String cellToString(Cell cell) {
+
+        Object result = null;                               
+        switch (cell.getCellType()) 
+        {
+        case Cell.CELL_TYPE_NUMERIC:
+                        DataFormatter fmt = new DataFormatter();
+                        result = fmt.formatCellValue(cell);
+                        break;
+
+        case Cell.CELL_TYPE_STRING:
+                        result = cell.getStringCellValue() ;
+                        break;
+
+        case Cell.CELL_TYPE_BLANK:
+                        result = "-";
+                        break;
+        case Cell.CELL_TYPE_FORMULA:
+            result = cell.getStringCellValue() ;
+            break;                          
+
+
+        default:
+                        System.out.println("There are no support for this type of cell" + cell.getCellType()+cell.getStringCellValue()); //SOP DONT DELETE
+        }
+        return result.toString() ;
+}
+
+	/*private  WebDriver open_browser( String browserType, String windowQuadrant) throws Exception{
+        WebDriver wd = null;
+        System.out.println("browserType: "+browserType);
+        if (browserType.equalsIgnoreCase("FireFox")) {                                	
+	System.setProperty("webdriver.firefox.bin", fireFoxPath);           
+	wd = new FirefoxDriver();
+
+                        wd.manage().window().maximize();
+
+        } else if (browserType.equalsIgnoreCase("IE")) {
+                       System.setProperty("webdriver.ie.driver", "C:\\SeleniumConfig\\IEDriverServer.exe");
+                        DesiredCapabilities caps = DesiredCapabilities.internetExplorer();
+                        caps.setCapability( InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,true);
+                        wd = new InternetExplorerDriver(caps);  
+                        wd.manage().window().maximize();
+
+        } else if (browserType.equalsIgnoreCase("chrome")) {
+                        System.setProperty("webdriver.chrome.driver","C:\\SeleniumConfig\\chromedriver.exe");                                	
+                        wd = new ChromeDriver();
+                        wd.manage().window().maximize();
+        }else if (browserType.equalsIgnoreCase("Safari")){     	
+	System.setProperty("webdriver.safari.driver", "C:\\Program Files (x86)\\Safari\\Safari.exe");
+				wd = new SafariDriver();
+				 wd.manage().window().maximize();
+				       }                              
+        return wd ;
+	}*/
+
+private  void navigate_to( WebDriver wd ,String url, String browserType) {
+        if (browserType.equalsIgnoreCase("FireFox")) {
+                        wd.get(url) ;
+        } else if (browserType.equalsIgnoreCase("IE")) {
+                        wd.get(url) ;
+                        //wd.get("javascript:document.getElementById('overridelink').click();");
+        } else if (browserType.equalsIgnoreCase("chrome")) {
+                        wd.get(url) ;
+                   } else if (browserType.equalsIgnoreCase("safari")) {
+            wd.get(url) ;
+        }  
+			//wd.navigate().refresh();
+}
+
+
+public void DesiredCapabilities() throws Exception{
+	WebDriver driver;
+	String driverPath ="E:\\Selenium\\EXE\\geckodriver-v0.26.0-win64\\geckodriver.exe";
+	
+	System.setProperty("webdriver.gecko.driver",driverPath );
+	DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+	capabilities.setCapability("marionette",true);
+	driver= new FirefoxDriver(capabilities);
+	
+	{
+		Switch "capabilities":
+		      [
+		       case
+		        {
+		          "browserName": "*firefox",
+		          "maxInstances": 5,
+		          "seleniumProtocol": "Selenium"
+		        },
+		        {
+		          "browserName": "*googlechrome",
+		          "maxInstances": 5,
+		          "seleniumProtocol": "Selenium"
+		        },
+		        {
+		          "browserName": "*iexplore",
+		          "maxInstances": 1,
+		          "seleniumProtocol": "Selenium"
+		        },
+		        {
+		          "browserName": "firefox",
+		          "maxInstances": 5,
+		          "seleniumProtocol": "WebDriver"
+		        },
+		        {
+		          "browserName": "chrome",
+		          "maxInstances": 5,
+		          "seleniumProtocol": "WebDriver"
+		        },
+		        {
+		          "browserName": "internet explorer",
+		          "maxInstances": 1,
+		          "seleniumProtocol": "WebDriver"
+		        }
+		      ],
+		  "configuration":
+		  {
+		    "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy",
+		    "maxSession": 5,
+		    "port": 5555,
+		    "host": ip,
+		    "register": true,
+		    "registerCycle": 5000,
+		    "hubPort": 4444,
+		    "hubHost": ip
+		  }
+		}
+
+
+
+
+
+
+}
+
+
+
+}
