@@ -1,0 +1,93 @@
+package stepDefinition;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.safari.SafariDriver;
+
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+
+public class FnBrowserandAppLaunch {
+	public class fnBrowserandAppLaunch {
+		public String baseURL = (fnTestData.DITUrl);
+		public WebDriver driver;
+
+		PaymentsInputOutgoingBKT callBKTFun  = new PaymentsInputOutgoingBKT();
+		
+//		@Given("^I navigate to UAT$")
+		@Given("^I navigate to UAT url\"(.*)\"$")
+		public void selectBRandOpenApp1 (String browserType) throws Throwable {
+			System.out.println("browserType: " + browserType);
+			if (browserType.equalsIgnoreCase("FireFox")) {
+				System.setProperty("webdriver.firefox.bin", "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe");
+				callBKTFun.driver = new FirefoxDriver();
+				callBKTFun.driver.manage().window().maximize();
+				callBKTFun.driver.get(baseURL);
+			} else if (browserType.equalsIgnoreCase("IE")) {
+				System.setProperty("webdriver.ie.driver", "C:\\SeleniumConfig\\IEDriverServer.exe");
+				DesiredCapabilities caps = DesiredCapabilities.internetExplorer();
+				caps.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+				callBKTFun.driver = new InternetExplorerDriver(caps);
+				callBKTFun.driver.manage().window().maximize();
+				callBKTFun.driver.get(baseURL);
+			} else if (browserType.equalsIgnoreCase("chrome")) {
+				System.setProperty("webdriver.chrome.driver", "C:\\SeleniumConfig\\chromedriver.exe");
+				callBKTFun.driver = new ChromeDriver();
+				callBKTFun.driver.manage().window().maximize();
+				callBKTFun.driver.get(baseURL);
+			} else if (browserType.equalsIgnoreCase("Safari")) {
+				System.setProperty("webdriver.safari.driver", "C:\\Program Files (x86)\\Safari\\Safari.exe");
+				callBKTFun.driver = new SafariDriver();
+				callBKTFun.driver.manage().window().maximize();
+				callBKTFun.driver.get(baseURL);
+				
+			}
+		}
+
+		@When("^she chooses to sign up$")
+		public void she_chooses_to_sign_up() throws Throwable {
+			callBKTFun.BKTPaymentInitiation();
+			}
+
+		@Then("^home page should be displayed$")
+		public void home_page_should_be_displayed() throws Throwable {
+			callBKTFun.PaymentInitiationPage();
+		}
+
+		@Given("^User Selected PaymentCurrency$")
+		public void SelectPaymentCurrency() throws Throwable {
+			callBKTFun.Select_CurrecnyformLookUp();
+		}
+		
+		@Given("^User Selected DebitAccount$")
+		public void SelectDebditAccount() throws Throwable {
+			callBKTFun.Select_DebitAccountformLookUp();
+		}
+		
+		@When("^select Payment method$")
+		public void select_Payment_method() throws Throwable {
+			callBKTFun.Select_PaymentmethodandType();
+			}
+		
+		@When("^EnterDFT Double Detais$")
+		public void EnterDFT_Double_Detais() throws Throwable {
+			callBKTFun.EnterDFT_Double_Detais();
+			}
+		
+		@When("^select single Payment method$")
+		public void select_single_Payment_method() throws Throwable {
+			callBKTFun.Select_SingleDebitPaymentmethodandType();
+			}
+		
+		@When("^EnterDFT Single Detais$")
+		public void EnterDFT_Single_Detais() throws Throwable {
+			callBKTFun.EnterDFT_SinglDebit_Details();
+			}
+		
+	}
+}
+
